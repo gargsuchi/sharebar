@@ -652,3 +652,7 @@ $databases['default']['default'] = array (
 $settings['install_profile'] = 'standard';
 $config_directories['active'] = 'sites/default/files/config_90fcxFmL9kGuLyttH0F7sisSPfTPKmLUymm99C4G1QtV_vjEk5no37ksGaIWZogwyW8ExTusNA/active';
 $config_directories['staging'] = 'sites/default/files/config_90fcxFmL9kGuLyttH0F7sisSPfTPKmLUymm99C4G1QtV_vjEk5no37ksGaIWZogwyW8ExTusNA/staging';
+
+if (file_exists('/var/www/site-php')) {
+    require '/var/www/site-php/eesgarg/eesgarg-settings.inc';
+}
