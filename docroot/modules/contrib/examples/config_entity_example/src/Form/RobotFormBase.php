@@ -7,7 +7,6 @@
 
 namespace Drupal\config_entity_example\Form;
 
-use Drupal\Core\Url;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Form\FormStateInterface;
@@ -205,17 +204,20 @@ class RobotFormBase extends EntityForm {
     $status = $robot->save();
 
     // Grab the URL of the new entity. We'll use it in the message.
-    $uri = $robot->url();
+    $url = $robot->urlInfo();
+
+    // Create an edit link.
+    $edit_link = $this->l(t('Edit'), $url);
 
     if ($status == SAVED_UPDATED) {
       // If we edited an existing entity...
       drupal_set_message($this->t('Robot %label has been updated.', array('%label' => $robot->label())));
-      watchdog('contact', 'Robot %label has been updated.', array('%label' => $robot->label()), WATCHDOG_NOTICE, l($this->t('Edit'), $uri . '/edit'));
+      $this->logger('contact')->notice('Robot %label has been updated.', ['%label' => $robot->label(), 'link' => $edit_link]);
     }
     else {
       // If we created a new entity...
       drupal_set_message($this->t('Robot %label has been added.', array('%label' => $robot->label())));
-      watchdog('contact', 'Robot %label has been added.', array('%label' => $robot->label()), WATCHDOG_NOTICE, l($this->t('Edit'), $uri . '/edit'));
+      $this->logger('contact')->notice('Robot %label has been added.', ['%label' => $robot->label(), 'link' => $edit_link]);
     }
 
     // Redirect the user back to the listing route after the save operation.
