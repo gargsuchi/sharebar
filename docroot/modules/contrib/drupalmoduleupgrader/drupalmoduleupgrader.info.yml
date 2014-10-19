@@ -1,0 +1,10 @@
+name: Drupal Module Upgrader
+description: Provides tools for upgrading Drupal 7 modules to Drupal 8.
+# core: 8.x
+type: module
+
+# Information added by Drupal.org packaging script on 2014-10-08
+version: '8.x-1.x-dev'
+core: '8.x'
+project: 'drupalmoduleupgrader'
+datestamp: 1412792030

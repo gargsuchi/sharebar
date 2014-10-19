@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * Implements hook_theme().
+ */
+function drupalmoduleupgrader_theme() {
+  return [
+    'dmu_block' => [
+      'variables' => [
+        'module' => 'MYMODULE',
+        'class' => 'MyBlock',
+        'block_id' => 'my_block_id',
+        'block_label' => \Drupal::translation()->translate('Untitled'),
+        'configurable' => FALSE,
+      ],
+      'template' => 'Block',
+    ],
+    'dmu_controller' => [
+      'variables' => [
+        'module' => 'MYMODULE',
+      ],
+      'template' => 'Controller',
+    ],
+    'dmu_event_subscriber' => [
+      'variables' => [
+        'module' => 'MYMODULE',
+        'class' => 'MyConfigForm',
+        'event' => 0,
+      ],
+      'template' => 'EventSubscriber',
+    ],
+    'dmu_form' => [
+      'variables' => [
+        'module' => 'MYMODULE',
+        'class' => 'MyForm',
+        'form_id' => 'my_form_id',
+        'config' => FALSE,
+      ],
+      'template' => 'Form',
+    ],
+    'dmu_outbound_path_processor' => [
+      'variables' => [
+        'module' => 'MYMODULE',
+      ],
+      'template' => 'OutboundPathProcessor',
+    ],
+    'dmu_logger' => [
+      'variables' => [
+        'module' => 'MYMODULE',
+      ],
+      'template' => 'Logger',
+    ],
+    'dmu_route_subscriber' => [
+      'variables' => [
+        'module' => 'MYMODULE',
+      ],
+      'template' => 'RouteSubscriber',
+    ],
+    'dmu_report' => [
+      'variables' => [
+        'report' => NULL,
+      ],
+      'template' => 'Report',
+    ],
+  ];
+}

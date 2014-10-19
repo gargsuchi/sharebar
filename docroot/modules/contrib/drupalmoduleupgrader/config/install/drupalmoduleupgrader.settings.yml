@@ -1,0 +1,8 @@
+#
+# This defines the default order in which certain conversion routines will be run.
+# You should only change this if you know _exactly_ what you're doing.
+#
+priority:
+  - Grep
+  - FunctionReplacement
+  - PSR4

@@ -1,0 +1,30 @@
+services:
+  module_indexer:
+    class: Drupal\drupalmoduleupgrader\Indexer\Database\IndexerFactory
+    arguments:
+      - @database
+      - @plugin.manager.drupalmoduleupgrader.module
+  plugin.manager.drupalmoduleupgrader.module:
+    class: Drupal\Core\Plugin\DefaultPluginManager
+    arguments:
+      - Plugin/DMU/ModuleWide
+      - @container.namespaces
+      - @module_handler
+      - Drupal\drupalmoduleupgrader\Converter\ConverterInterface
+      - Drupal\drupalmoduleupgrader\Annotation\Converter
+  plugin.manager.drupalmoduleupgrader.route:
+    class: Drupal\Core\Plugin\DefaultPluginManager
+    arguments:
+      - Plugin/DMU/Routing
+      - @container.namespaces
+      - @module_handler
+      - Drupal\drupalmoduleupgrader\Converter\Routing\RouteConverterInterface
+      - Drupal\drupalmoduleupgrader\Annotation\Converter
+  plugin.manager.drupalmoduleupgrader.function:
+    class: Drupal\Core\Plugin\DefaultPluginManager
+    arguments:
+      - Plugin/DMU/FunctionReplacement
+      - @container.namespaces
+      - @module_handler
+      - Drupal\drupalmoduleupgrader\Converter\ConverterInterface
+      - Drupal\drupalmoduleupgrader\Annotation\Converter

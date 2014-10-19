@@ -1,0 +1,8 @@
+composer.phar
+composer.lock
+vendor
+bin
+.DS_Store
+checkout
+cache
+.idea

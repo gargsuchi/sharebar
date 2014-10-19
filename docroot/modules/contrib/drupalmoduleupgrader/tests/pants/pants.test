@@ -1,0 +1,177 @@
+<?php
+
+/**
+ * @file
+ * Tests for Pants module.
+ */
+
+/**
+ * Tests configuration of Pants module.
+ */
+class PantsConfigurationTestCase extends DrupalWebTestCase {
+
+  protected $profile = 'testing';
+
+  /**
+   * Admin user.
+   */
+  protected $admin_user;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Configuration of pants',
+      'description' => "Ensures that an administrator can configure the type of pants used on the site.",
+      'group' => 'Pants',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('pants');
+
+    $this->admin_user   = $this->drupalCreateUser(array('administer pants'));
+  }
+
+  /**
+   * Ensures pants_type setting can be changed.
+   */
+  function testPantsConfiguration() {
+    $this->drupalLogin($this->admin_user);
+
+    $this->drupalGet('admin/config/people/pants');
+    $this->assertFieldByName('pants_type', '');
+
+    $this->drupalPost(NULL, array('pants_type' => 'bellbottoms'), t('Save configuration'));
+    $this->assertFieldByName('pants_type', 'bellbottoms');
+  }
+}
+
+/**
+ * Tests UI of Pants module.
+ */
+class PantsUITestCase extends DrupalWebTestCase {
+
+  protected $profile = 'testing';
+
+  /**
+   * Standard test user.
+   */
+  protected $web_user;
+
+  /**
+   * An admin user.
+   */
+  protected $admin_user;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'UI on your pants',
+      'description' => "Ensures that you can set and get a user's pants status through the UI.",
+      'group' => 'Pants',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('pants', 'views', 'block');
+
+    $this->web_user   = $this->drupalCreateUser(array('change pants status'));
+    $this->admin_user = $this->drupalCreateUser(array('administer blocks', 'administer pants'));
+  }
+
+  /**
+   * Ensures UI functionality is working.
+   */
+  function testPantsUserProfileUI() {
+    $this->drupalLogin($this->web_user);
+    $uid = $this->web_user->uid;
+
+    // Save the user profile, so that pants status is initialized and check that
+    // it's initialized to Off.
+    $this->drupalPost("user/$uid/edit", array(), t('Save'));
+    $this->drupalGet("user/$uid");
+    $this->assertText('Off');
+
+    // Change pants status and check it again.
+    $edit = array('pants_status[' . LANGUAGE_NONE . ']' => 1);
+    $this->drupalPost("user/$uid/edit", $edit, t('Save'));
+    $this->drupalGet("user/$uid");
+    $this->assertText('On');
+
+    // Set a non-default pants type. Ensure it is shown as an image.
+    variable_set('pants_type', 'bellbottoms');
+    $this->drupalGet("user/$uid");
+    $this->assertRaw('<img src="http://ecx.images-amazon.com/images/I/41xXmNdZn8L._SY200_.jpg"');
+  }
+
+  /**
+   * Test pants block functionality.
+   */
+  function testPantsBlocks() {
+    $this->drupalLogin($this->admin_user);
+
+    // Turn on the pants blocks.
+    $this->drupalPost('admin/structure/block/manage/pants/change_pants/configure', array('regions[bartik]' => 'sidebar_second'), t('Save block'));
+    $this->drupalPost('admin/structure/block/manage/views/pants_recent-block/configure', array('regions[bartik]' => 'sidebar_second'), t('Save block'));
+
+    // Change pants status from the "Change pants" block.
+    $this->clickLink(t('Change'));
+
+    // Verify it was changed in the "Recent pants" block.
+    $this->drupalGet('');
+    $this->assertText('put pants on');
+
+    // Repeat for pants off.
+    $this->clickLink(t('Change'));
+    $this->drupalGet('');
+    $this->assertText('took pants off');
+  }
+}
+
+/**
+ * Tests AJAX functionality of Pants module.
+ */
+class PantsAJAXTestCase extends AJAXTestCase {
+
+  protected $profile = 'testing';
+
+  /**
+   * Standard test user.
+   */
+  protected $web_user;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'AJAX on your pants',
+      'description' => "Ensures that you can set and get a user's pants status through AJAX.",
+      'group' => 'Pants',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('pants');
+
+    $this->web_user   = $this->drupalCreateUser(array('change pants status'));
+  }
+
+  /**
+   * Ensures AJAX functionality is working.
+   */
+  function testPantsAJAX() {
+    $this->drupalLogin($this->web_user);
+
+    // Send an AJAX request and verify the expected command is returned.
+    $commands = $this->drupalGetAJAX('pants/change/' . $this->web_user->uid);
+    $expected_command = array(
+      'command' => 'insert',
+      'data' => '<blink>On</blink>',
+    );
+    $this->assertCommand($commands, $expected_command, 'Expected AJAX command returned in response to putting pants on.');
+
+    // Repeat for pants off.
+    $commands = $this->drupalGetAJAX('pants/change/' . $this->web_user->uid);
+    $expected_command = array(
+      'command' => 'insert',
+      'data' => '<blink>Off</blink>',
+    );
+    $this->assertCommand($commands, $expected_command, 'Expected AJAX command returned in response to taking pants off.');
+  }
+}

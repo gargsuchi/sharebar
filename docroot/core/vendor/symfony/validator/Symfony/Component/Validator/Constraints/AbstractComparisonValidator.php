@@ -13,11 +13,13 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Provides a base class for the validation of property comparisons.
  *
  * @author Daniel Holmes <daniel@danielholmes.org>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class AbstractComparisonValidator extends ConstraintValidator
 {
@@ -26,16 +28,22 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof AbstractComparison) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\AbstractComparison');
+        }
+
         if (null === $value) {
             return;
         }
 
-        if (!$this->compareValues($value, $constraint->value)) {
-            $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->formatValue($value, self::OBJECT_TO_STRING | self::PRETTY_DATE),
-                '{{ compared_value }}' => $this->formatValue($constraint->value, self::OBJECT_TO_STRING | self::PRETTY_DATE),
-                '{{ compared_value_type }}' => $this->formatTypeOf($constraint->value),
-            ));
+        $comparedValue = $constraint->value;
+
+        if (!$this->compareValues($value, $comparedValue)) {
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value, self::OBJECT_TO_STRING | self::PRETTY_DATE))
+                ->setParameter('{{ compared_value }}', $this->formatValue($comparedValue, self::OBJECT_TO_STRING | self::PRETTY_DATE))
+                ->setParameter('{{ compared_value_type }}', $this->formatTypeOf($comparedValue))
+                ->addViolation();
         }
     }
 

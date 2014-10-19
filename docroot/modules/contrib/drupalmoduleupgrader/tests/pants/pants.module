@@ -1,0 +1,210 @@
+<?php
+
+/**
+ * @file
+ * Allows users to take their pants on and off.
+ */
+
+///// PERMISSIONS AND ACCESS /////
+
+/**
+ * Implements hook_permission().
+ */
+function pants_permission() {
+  return array(
+    'change pants status' => array(
+      'title' => t('Change pants status'),
+     ),
+    'administer pants' => array(
+      'title' => t('Administer pants'),
+    ),
+  );
+}
+
+/**
+ * Access callback: Checks permission to change pants status.
+ */
+function pants_change_access() {
+  return user_access('change pants status') || user_access('administer pants');
+}
+
+///// MENU /////
+
+/**
+ * Implements hook_menu().
+ */
+function pants_menu() {
+  $items['pants/change/%user'] = array(
+    'title' => 'Change pants',
+    'page callback' => 'pants_change',
+    'page arguments' => array(2),
+    'access callback' => 'pants_change_access', // Default.
+    'delivery callback' => 'ajax_deliver',
+    'type' => MENU_CALLBACK,
+    'file' => 'pants.pages.inc',
+  );
+  $items['admin/config/people/pants'] = array(
+    'title' => 'Pants',
+    'description' => 'Administer pants.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('pants_settings'),
+    'access callback' => 'user_access', // Defaut.
+    'access arguments' => array('administer pants'),
+    'type' => MENU_NORMAL_ITEM, // Default.
+    'file' => 'pants.admin.inc',
+  );
+
+  return $items;
+}
+
+///// BLOCKS /////
+
+/**
+ * Implements hook_block_info().
+ */
+function pants_block_info() {
+  $blocks['change_pants'] = array(
+    'info' => t('Change pants'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function pants_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'change_pants':
+      global $user;
+      $account = user_load($user->uid);
+
+      $block['subject'] = t('Change pants');
+      $block['content'] = array(
+        'status' => array(
+          '#theme' => 'pants_status',
+          '#pants_status' => !empty($account->pants_status[LANGUAGE_NONE][0]['value']),
+          '#prefix' => '<div id="pants-change-pants-status">',
+          '#suffix' => '</div>',
+        ),
+        'change_link' => array(
+          '#type' => 'link',
+          '#title' => t('Change'),
+          '#href' => "pants/change/{$user->uid}",
+          '#ajax' => array(
+            'wrapper' => 'pants-change-pants-status',
+            'method' => 'html',
+            'effect' => 'fade',
+          ),
+        ),
+      );
+      break;
+  }
+
+  return $block;
+}
+
+///// USER PROFILE HOOKS /////
+
+/**
+ * Implements hook_user_presave().
+ */
+function pants_user_presave(&$edit, $account, $category) {
+  global $user;
+
+  $original_pants_status = isset($account->original->pants_status[LANGUAGE_NONE][0]['value']) ? $account->original->pants_status[LANGUAGE_NONE][0]['value'] : NULL;
+  $new_pants_status = isset($account->pants_status[LANGUAGE_NONE][0]['value']) ? $account->pants_status[LANGUAGE_NONE][0]['value'] : NULL;
+  if ($new_pants_status !== $original_pants_status) {
+    db_insert('pants_history')
+      ->fields(array(
+        'uid' => $account->uid,
+        'status' => $new_pants_status,
+        'changed' => REQUEST_TIME,
+        'changed_by' => $user->uid,
+      ))
+      ->execute();
+  }
+}
+
+/**
+ * Implements hook_user_view().
+ */
+function pants_user_view($account, $view_mode, $langcode) {
+  if (isset($account->content['pants_status'])) {
+    $account->content['pants_status'][0] = array(
+      '#theme' => 'pants_status',
+      '#pants_status' => $account->pants_status[LANGUAGE_NONE][0]['value'],
+      '#pants_type' => variable_get('pants_type', ''),
+    );
+  }
+}
+
+///// PLUGIN MANAGEMENT ////
+
+/**
+ * Implements hook_ctools_plugin_type().
+ */
+function pants_ctools_plugin_type() {
+  return array(
+    'pants_type' => array(),
+  );
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function pants_ctools_plugin_directory($module, $plugin_type) {
+  $directories['pants']['pants_type'] = 'plugins/pants_type';
+  if (isset($directories[$module][$plugin_type])) {
+    return $directories[$module][$plugin_type];
+  }
+}
+
+///// VIEWS ////
+
+/**
+ * Implements hook_views_api().
+ */
+function pants_views_api() {
+  return array(
+    'api' => 2,
+  );
+}
+
+///// THEMING ////
+
+/**
+ * Implements hook_theme().
+ */
+function pants_theme() {
+  return array(
+    'pants_status' => array(
+      'variables' => array('pants_status' => 0, 'pants_type' => ''),
+      'template' => 'pants-status',
+    ),
+  );
+}
+
+/**
+ * Preprocesses variables for pants-status.tpl.php.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - pants_status: 1 if the pants are on. 0 if the pants are off.
+ *   - pants_type: Type of pants to display (defaults to none).
+ */
+function template_preprocess_pants_status(&$variables) {
+  if ($variables['pants_type']) {
+    ctools_include('plugins');
+    $callback = $variables['pants_status'] ? 'view_enabled callback' : 'view_disabled callback';
+    $function = ctools_plugin_load_function('pants', 'pants_type', $variables['pants_type'], $callback);
+    $variables['content'] = $function();
+  }
+  else {
+    $variables['content'] = array('#markup' => $variables['pants_status'] ? t('On') : t('Off'));
+  }
+}
+

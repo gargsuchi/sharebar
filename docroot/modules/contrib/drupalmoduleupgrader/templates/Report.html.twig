@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,400,700,600' rel='stylesheet' type='text/css' />
+    <style type="text/css">
+    <!--
+
+body {
+  width: 80%;
+  color: #343434;
+  margin: 1em auto;
+  font-family: 'Open Sans', Verdana, sans-serif;
+}
+
+details {
+  font-size: 18px;
+  line-height: 25px;
+  margin-bottom: 2em;
+}
+
+details summary {
+  padding: 1em;
+  margin-bottom: 1em;
+}
+
+details.error summary {
+  background-color: #ffd5d5;
+}
+
+details.warning summary {
+  background-color: #fff3bb;
+}
+
+a {
+  color: #095cb1;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+h5 {
+  font-size: 1em;
+}
+
+aside {
+  font-style: italic;
+  line-height: 20px;
+  font-size: 15px;
+}
+
+var {
+  font-family: mono;
+}
+
+    -->
+    </style>
+  </head>
+  <body>
+  {% autoescape false %}
+  {% for issue in report.Issues() %}
+    <details class="{{ issue.ErrorLevel }}">
+      <summary>{{ issue.Title() }}</summary>
+
+      {% if issue.Summary is not empty %}<div>{{ issue.Summary }}</div>{% endif %}
+
+      {% if issue.Documentation is not empty %}
+      <h5>Documentation</h5>
+      <ul>
+        {% for doc in issue.Documentation %}
+        <li><a target="_blank" href="{{ doc.url }}">{{ doc.title }}</a></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      {% if issue.Violations is not empty %}
+      <h5>Files Affected</h5>
+      <ul>
+      {% for violation in issue.Violations %}
+        <li>{{ violation.file }}{% if violation.line_number %}, line {{ violation.line_number }}{% endif %}</li>
+      {% endfor %}
+      </ul>
+      {% endif %}
+
+      {% if issue.Detectors is not empty %}<aside>Flagged by {{ issue.Detectors|join(', ') }}</aside>{% endif %}
+    </details>
+  {% endfor %}
+  {% endautoescape %}
+  </body>
+</html>

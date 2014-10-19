@@ -1,0 +1,19 @@
+<?php
+
+class FoobarUITestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Foobar Test',
+      // The description and group should be in the class annotation.
+      'description' => 'Tests the Foobar UI.',
+      'group' => 'Foobar',
+    );
+  }
+  
+  public function setUp() {
+    // This should be converted to a public static $modules property
+    parent::setUp('cer');
+  }
+
+}

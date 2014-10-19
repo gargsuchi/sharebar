@@ -13,9 +13,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\RangeValidator;
+use Symfony\Component\Validator\Validation;
 
 class RangeValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new RangeValidator();
@@ -180,38 +186,6 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
             array('20.000001'),
             array(new \stdClass()),
         );
-    }
-
-    public function testMinMessageIsSet()
-    {
-        $constraint = new Range(array(
-            'min' => 10,
-            'max' => 20,
-            'minMessage' => 'myMessage',
-        ));
-
-        $this->validator->validate(9, $constraint);
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', 9)
-            ->setParameter('{{ limit }}', 10)
-            ->assertRaised();
-    }
-
-    public function testMaxMessageIsSet()
-    {
-        $constraint = new Range(array(
-            'min' => 10,
-            'max' => 20,
-            'maxMessage' => 'myMessage',
-        ));
-
-        $this->validator->validate(21, $constraint);
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', 21)
-            ->setParameter('{{ limit }}', 20)
-            ->assertRaised();
     }
 
     public function testNonNumeric()

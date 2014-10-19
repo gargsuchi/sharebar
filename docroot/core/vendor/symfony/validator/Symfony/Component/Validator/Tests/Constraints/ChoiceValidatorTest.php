@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\ChoiceValidator;
+use Symfony\Component\Validator\Validation;
 
 function choice_callback()
 {
@@ -21,6 +22,11 @@ function choice_callback()
 
 class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new ChoiceValidator();
@@ -155,6 +161,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"baz"')
+            ->setInvalidValue('baz')
             ->assertRaised();
     }
 
@@ -268,6 +275,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"3"')
+            ->setInvalidValue('3')
             ->assertRaised();
     }
 }

@@ -1,0 +1,84 @@
+# This file controls the behaviour of the DisableFunctionCall plugin deriver.
+
+drupal_set_title:
+  message: '<code>drupal_set_title()</code> has been removed.'
+  fixme: 'drupal_set_title() has been removed in Drupal 8. Setting the title is now done in different ways depending on the context. For more information, see https://www.drupal.org/node/2067859'
+ctools_include:
+  message: 'Most CTools APIs have moved into core.'
+  fixme: 'Most CTools APIs have moved into core. For more information, see https://www.drupal.org/node/2164623'
+ctools_export:
+  message: 'The CTools Export API has moved into core.'
+  fixme: 'The CTools Export API has into core in the form of exportable configuration and content entities. For more information, see https://www.drupal.org/developing/api/entity'
+  functions:
+    - ctools_export_crud_new
+    - ctools_export_crud_load
+    - ctools_export_crud_load_multiple
+    - ctools_export_crud_load_all
+    - ctools_export_crud_save
+    - ctools_export_crud_delete
+    - ctools_export_crud_export
+    - ctools_export_crud_import
+    - ctools_export_crud_set_status
+    - ctools_export_crud_enable
+    - ctools_export_crud_disable
+    - ctools_export_load_object
+    - ctools_export_load_object_reset
+    - ctools_get_default_object
+    - ctools_export_unpack_object
+    - ctools_var_export
+    - ctools_export_object
+    - ctools_export_get_schema
+    - ctools_export_get_schemas
+    - ctools_export_get_schemas_by_module
+    - ctools_export_set_status
+    - ctools_export_set_object_status
+    - ctools_export_form
+    - ctools_export_new_object
+    - ctools_export_to_hook_code
+    - ctools_export_default_to_hook_code
+    - ctools_export_default_list
+db_legacy_tables:
+  # DBLegacyTables extends DisableFunctionCall, only allowing a call to be disabled
+  # if it refers to a legacy table.
+  class: Drupal\drupalmoduleupgrader\Plugin\DMU\FunctionReplacement\DBLegacyTables
+  message: 'The <kbd>variable</kbd> database table has been removed.'
+  fixme: 'Certain database tables have been removed in Drupal 8.'
+  functions:
+    - db_insert
+    - db_update
+    - db_delete
+    - db_select
+    - db_merge
+    - db_truncate
+  tables:
+    - variable
+field:
+  message: 'The Field API CRUD functions have been removed.'
+  fixme: 'Fields and field instances are now exportable configuration entities. For more information, see https://www.drupal.org/node/2012896'
+  functions:
+    - field_create_field
+    - field_create_instance
+    - field_delete_field
+    - field_delete_instance
+    - field_info_fields
+menu:
+  message: '<code>menu_get_item()</code> and <code>menu_set_item</code> have been removed.'
+  fixme: 'The core routing and link system (hook_menu) has been completely replaced, and most menu-related functions have been removed. For more information, see https://www.drupal.org/node/2203305'
+  functions:
+    - menu_get_item
+    - menu_set_item
+language_types_disable:
+  message: '<code>language_types_disable()</code> has been removed.'
+  fixme: 'This function has been removed from Drupal 8. For more information, see https://www.drupal.org/node/2174591'
+language_types_set:
+  message: 'The syntax of <code>language_types_set()</code> has changed.'
+  fixme: 'This function follows a different syntax in Drupal 8. For more information, see https://www.drupal.org/node/2174591'
+theme:
+  message: 'Low-level theme registry functions have moved.'
+  fixme: 'Low-level parts of the theme system have moved. For more information, see https://www.drupal.org/node/2137545'
+  functions:
+    - _theme_load_registry
+    - _theme_save_registry
+    - _theme_process_registry
+    - _theme_build_registry
+    - _theme_load_offline_registry

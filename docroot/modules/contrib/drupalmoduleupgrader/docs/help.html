@@ -1,0 +1,207 @@
+<h2>Vas ist das?</h2>
+
+<p>The Drupal Module Upgrader (DMU) is a module that converts Drupal 7 modules to Drupal 
+8.</p>
+
+<figure>
+  <img src="./whoa.jpg" alt="Whoa, dude." />
+</figure>
+
+<h2>Using DMU</h2>
+
+<p>Currently, the only way to run DMU is as a Drush command. Put your D7 module directly
+in your <code>modules</code> directory -- not a subdirectory -- and enable DMU. Then run
+<code>drush dmu-upgrade target_module</code>. If there's no output, it means everything
+worked. If you look at your module now, you should see at least a .info.yml file there --
+and, unless you've got a <em>really</em> simple module, a few other things.</p>
+
+<p>For all its awesomeness, DMU isn't omnipotent. There are things it can't effectively
+convert. For example, if your implementation of <code>hook_menu()</code> contains logic --
+an <code>if</code> statement, <code>switch</code> statement, or function call -- DMU
+will fail with an error, because it cannot effectively trace your module's logic. You'll
+need to convert it manually.</p>
+
+<h2>How didst thou this sorcery?</h2>
+
+<p>DMU works by running plugins, each of which is responsible for changing some 
+specific piece of the module's code. Examples include:</p>
+
+<ul>
+  <li>A plugin to convert the legacy .info format used by Drupal 7 into the .info.yml
+  format used by Drupal 8, removing values that no longer exist.
+  (<code>src/Plugin/DMU/Module/InfoToYAML.php</code>).</li>
+  <li>There's a plugin that converts simple implementations of <code>hook_menu()</code>
+  -- the ones that don't have any special logic -- to various YAML files, converting the
+  callback functions into methods in a controller class
+  (<code>src/Plugin/DMU/Module/HookMenu.php</code>).</li>
+  <li>There are plugins to convert <code>hook_init()</code> and <code>hook_exit()</code>
+  to callback methods in event subscriber classes
+  (<code>src/Plugin/DMU/Module/HookInit.php</code>
+  and <code>src/Plugin/DMU/Module/HookExit.php</code>).</li>
+</ul>
+
+<p>Like any other plugin, DMU converters have full access to the Drupal API, and if you
+run the DMU under Drush (and at the time of this writing, that's the only way to run DMU),
+you get the Drush API as well. They're implemented using the core plugin system, so you
+can obviously write your own.</p>
+
+<p>All plugins receive an instance of <code>Drupal\drupalmoduleupgrader\ModuleContext</code>.
+This object contains the state of the module being converted (i.e., various public properties
+for plugins to manipulate), plus helpful utility methods for plugins to use.</p>
+
+<p>To analyze, parse, and modify PHP code, DMU relies on 
+<a href="https://github.com/grom358/pharborist">Pharborist</a>, which it installs as
+a dependency via Composer. Pharborist parses PHP code into an <dfn>abstract syntax tree</dfn>,
+which can then be crawled through and modified in a very jQuery-ish way. If you write
+a conversion plugin that needs to rewrite PHP code in any way (or, for that matter, move
+functions around), you'll need Pharborist.</p>
+
+<h2>Writing DMU plugins</h2>
+
+<p>First, you need to decide what kind of plugin to write. There are several 
+types, each of which lives in a particular namespace and may implement a 
+particular interface. All DMU plugins must ultimately implement
+<code>Drupal\drupalmoduleupgrader\Converter\ConverterInterface</code>, which 
+may itself be extended by some plugin types, in order to define methods specific 
+to that type.</p>
+
+<p>Without further ado, the DMU plugin type buffet:</p>
+
+<dl>
+  <dt>Module Converters</dt>
+  <dd>
+    <p>
+      <code>Plugin\DMU\ModuleWide</code> namespace
+    </p>
+    <p>
+      Module converters act on the module as a whole, and are generally run only once
+      per module. An example of a module converter is a hook converter -- modules
+      implement hooks only once, so a hook converter should only run once per module.
+      This is the only plugin type that can be specifically enabled or disabled with
+      the <code>--only</code> and <code>--skip</code> options of
+      <code>drush dmu-upgrade</code>.
+    </p>
+  </dd>
+  <dt>Route Converters</dt>
+  <dd>
+    <p>
+      <code>Plugin\DMU\Routing</code> namespace
+    </p>
+    <p>
+      These plugins convert individual <code>hook_menu()</code> items to routes. They're
+      also responsible for generating controller classes and moving functions around, as
+      needed. These plugins are identified by the name of the D7 page callback function
+      that they handle -- for example, the <code>drupal_get_form</code> route converter
+      will convert menu items that call <code>drupal_get_form()</code>. Route converters
+      are delegated as needed by the <code>HookMenu</code> plugin.
+    </p>
+  </dd>
+  <dt>Function Replacement</dt>
+  <dd>
+    <p>
+      <code>Plugin\DMU\FunctionReplacement</code> namespace
+    </p>
+    <p>
+      These plugins do exactly what you think: rewrite function <strong>calls</strong>. 
+      Like route converters, they're also identified by the name of the Drupal 7 
+      function they handle.
+    </p>
+  </dd>
+  <dt>Parametric Rewriters</dt>
+  <dd>
+    <p>
+      <code>Plugin\DMU\ParametricRewriter</code> namespace
+    </p>
+    <p>
+      These are intelligent search-and-replace plugins that act on a complete function.
+      To illustrate, consider this fairly useless function:
+    </p>
+    <pre><code>
+function get_uid($account) {
+  $uid = $account->uid;
+}
+    </code></pre>
+    <p>That first line is problematic in Drupal 8, because to access entity IDs you now
+    use <code>$entity->id()</code>, not direct property access. But just making a grep
+    target isn't going to suffice here, because there is too much we don't know. When DMU
+    looks at this, it has no way to tell exactly what <code>$account</code> is. And for
+    that matter, what if it were named something different, like <code>$user_account</code>?
+    Grep is too dumb to work out these kinds of distinctions, so we need something smarter.</p>
+    <p>A parametric rewriter is that something. When you use one, you essentially
+    tell it, &quot;Okay -- I'm telling you that the first parameter of this function is a 
+    user account. Now rewrite the function as needed.&quot; Armed with that information, 
+    the  rewriter can trawl through the function and make the appropriate changes,
+    depending on the data type. Parametric rewriters are also smart enough to handle
+    getting (as in the above example) and setting (<code>$node->title = 'Foobaz'</code>)
+    differently. There are different parametric rewriters to handle different data
+    types; the ID of a parametric rewriter plugin is the type of data it handles, like
+    &quot;node&quot; or &quot;user&quot;, although it doesn't <em>have</em> to be an
+    entity type.</p> 
+  </dd>
+</dl>
+<h2>Annotation Structure</h2>
+<p>Plugins are annotated as <code>@Converter</code> blocks, with the following keys:</p>
+<dl>
+  <dt>id</dt>
+  <dd>
+    The plugin ID (all plugins in Drupal 8 have one). The ID is meaningful
+    to DMU, depending on what type of plugin you're writing.
+  </dd>
+  <dt>description</dt>
+  <dd>
+    A short, translated description of what the plugin does.
+  </dd>
+  <dt>change_notice</dt>
+  <dd>
+    The node ID of a change notice on drupal.org which explains more about the changes
+    the plugin makes. This key is technically optional, but you should strive to include
+    it wherever possible. It can be an array if more than one change notice applies.
+  </dd>
+  <dt>message</dt>
+  <dd>
+    The default (translated) message to be displayed if the issue handled by the 
+    plugin is detected by the <code>dmu-analyze</code> command.
+  </dd>
+  <dt>delegator (optional)</dt>
+  <dd>
+    Some plugins use <dfn>delegates</dfn>, i.e., other plugins which do some work on
+    behalf of the parent plugin. If a plugin needs to use delegates, it can specify
+    the ID of the delegate plugin manager service here, which will be provided
+    to the parent plugin as <code>$this->delegator</code>.
+  </dd>
+  <dt>hook (optional)</dt>
+  <dd>
+    If the plugin converts a specific hook, specify that hook here, without
+    the hook_ prefix. This only applies to module converters that extend
+    <code>Drupal\drupalmoduleupgrader\Converter\HookConverterBase</code>, and
+    is ignored for other plugin types.
+  </dd>
+</dl>
+<h2>A few words on function replacement...</h2>
+<p>Not every function replacement needs a full-fledged FunctionReplacement plugin. In
+many cases, Drupal 7 functions have merely been renamed. If you find yourself needing
+to convert one of those, breathe a sigh of relief, then keep calm and add it as a target
+for the Grep plugin :) More about that will be added soon; for now, look at grep.json, 
+in the DMU root directory. You'll figure it out in a jiffy.</p>
+<p>So when <em>do</em> you need to write a FunctionReplacement plugin? Easy: when you're
+rewriting a function call whose arguments, or entire structure, has changed. For 
+example, let us consider the venerable <code>user_access()</code> function, called
+thusly in Drupal 7:</p>
+<pre><code>user_access('break stuff');</code></pre>
+<p>In Drupal 8, it looks like this:</p>
+<pre><code>\Drupal::currentUser()->hasPermission('break stuff');</code></pre>
+<p>It looks intimidating, but this is a simple renaming. Both calls have the same number
+of arguments, of the same type. The only thing that's changed is everything before the
+opening parenthesis. So this conversion involves nothing more than adding a new target
+for the Grep plugin to deal with.</p>
+<p>So let's turn up the heat and consider the equally venerable 
+<code>variable_get()</code>. In Drupal 7:</p>
+<pre><code>variable_get('pants_type', 'mchammer');</code></pre>
+<p>And in Drupal 8:</p>
+<pre><code>\Drupal::config('pants.settings')->get('pants_type');</code></pre>
+<p>Right there, we see a number of major differences. <code>variable_get()</code> has
+no idea what <code>pants.settings</code> is, and the <code>get()</code> method doesn't 
+accept a default value for the second argument -- that's expected to be in a YAML file 
+in the module's <code>config/install/pants.settings.yml</code> file. This is a function 
+call that cries out plaintively for a plugin (and it has one; see 
+<code>src/Plugin/DMU/FunctionReplacement/VariableGet.php</code>.</p>

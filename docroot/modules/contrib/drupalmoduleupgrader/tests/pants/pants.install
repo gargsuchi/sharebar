@@ -1,0 +1,78 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the pants module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function pants_schema() {
+  $schema['pants_history'] = array(
+    'description' => 'TODO: please describe this table!',
+    'fields' => array(
+      'uid' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'status' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'changed' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'changed_by' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function pants_install() {
+  field_create_field(array(
+    'field_name' => 'pants_status',
+    'type' => 'list_boolean',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => t('Off'),
+        1 => t('On'),
+      ),
+    ),
+    'locked' => TRUE,
+  ));
+  field_create_instance(array(
+    'field_name' => 'pants_status',
+    'entity_type' => 'user',
+    'bundle' => 'user',
+    'label' => t('Pants status'),
+    'widget' => array(
+      'type' => 'options_onoff',
+      'settings' => array(
+        'display_label' => TRUE,
+      ),
+    ),
+  ));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function pants_uninstall() {
+  variable_del('pants_type');
+  field_delete_field('pants_status');
+}

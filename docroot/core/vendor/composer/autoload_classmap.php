@@ -391,12 +391,12 @@ return array(
     'SebastianBergmann\\Diff\\LCS\\TimeEfficientImplementation' => $vendorDir . '/sebastian/diff/src/LCS/TimeEfficientLongestCommonSubsequenceImplementation.php',
     'SebastianBergmann\\Diff\\Line' => $vendorDir . '/sebastian/diff/src/Line.php',
     'SebastianBergmann\\Diff\\Parser' => $vendorDir . '/sebastian/diff/src/Parser.php',
+    'SebastianBergmann\\Environment\\Console' => $vendorDir . '/sebastian/environment/src/Console.php',
     'SebastianBergmann\\Environment\\Runtime' => $vendorDir . '/sebastian/environment/src/Runtime.php',
     'SebastianBergmann\\Exporter\\Context' => $vendorDir . '/sebastian/exporter/src/Context.php',
     'SebastianBergmann\\Exporter\\Exception' => $vendorDir . '/sebastian/exporter/src/Exception.php',
     'SebastianBergmann\\Exporter\\Exporter' => $vendorDir . '/sebastian/exporter/src/Exporter.php',
     'SebastianBergmann\\Version' => $vendorDir . '/sebastian/version/src/Version.php',
     'SessionHandlerInterface' => $vendorDir . '/symfony/http-foundation/Symfony/Component/HttpFoundation/Resources/stubs/SessionHandlerInterface.php',
-    'Symfony\\Component\\HttpFoundation\\Resources\\stubs\\FakeFile' => $vendorDir . '/symfony/http-foundation/Symfony/Component/HttpFoundation/Resources/stubs/FakeFile.php',
     'Text_Template' => $vendorDir . '/phpunit/php-text-template/Text/Template.php',
 );

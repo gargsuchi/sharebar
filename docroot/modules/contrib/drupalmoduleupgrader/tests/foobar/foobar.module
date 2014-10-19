@@ -1,0 +1,45 @@
+<?php
+
+// This should be moved into the Drupal\foobar namespace, and written to
+// ./src/FrouFrou.php
+class FrouFrou {}
+
+/**
+ * Implements hook_watchdog().
+ */
+function foobar_watchdog(array $log_entry) {
+  // The presence of this hook should result in a default logger being shot off
+  // in ./src/Logger/DefaultLogger.php.
+}
+
+/**
+ * Implements hook_url_outbound_alter().
+ */
+function foobar_url_outbound_alter(&$path, &$options, $original_path) {
+  // The presence of this hook should generate a path processor at
+  // ./src/OutboundPathProcessor.php.
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function foobar_menu_alter(array &$menu) {
+  // The presence of this hook should result in a bunch of blank link-altering
+  // hooks being generated, as well as a route subscriber class.
+}
+
+/**
+ * Implements hook_init().
+ */
+function foobar_init() {
+  // The presence of this hook should result in an event subscriber being
+  // generated at ./src/EventSubscriber/InitSubscriber.php.
+}
+
+/**
+ * Implements hook_exit().
+ */
+function foobar_exit() {
+  // The presence of this hook should result in an event subscriber being
+  // generated at ./src/EventSubscriber/ExitSubscriber.php.
+}

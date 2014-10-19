@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Implements hook_uninstall().
+ */
+function foobar_uninstall() {
+  variable_del('foobar_garbage');
+}

@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function drupalmoduleupgrader_schema() {
+  return [
+    'dmu_index' => [
+      'description' => 'Stores index information about modules being converted by the Drupal Module Upgrader.',
+      'fields' => [
+        'module' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'description' => 'The machine name of the module which owns this object.',
+        ],
+        'type' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'description' => 'The object type.',
+        ],
+        'name' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'description' => 'The name of the object. Varies by object type.',
+        ],
+        'file' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'description' => 'Path to the file which contains the object.',
+        ],
+      ],
+      'indexes' => [
+        'module' => ['module'],
+        'module_type' => ['module', 'type'],
+        'type_name' => ['type', 'name'],
+      ],
+    ],
+  ];
+}

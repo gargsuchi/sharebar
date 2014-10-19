@@ -1,0 +1,56 @@
+Because 8.x is in active flux, this tutorial falls out of date really easily.
+
+When performing an update, here are the steps:
+
+0) Do a clone of what's there into your desktop or something in a folder called
+   "pants-bak-DO-NOT-PULL" or similar. This will be your reference repo.
+
+   cd ~/Desktop
+   git clone webchick@git.drupal.org:project/pants.git pants-BAK
+   cd pants-BAK
+
+0.5) Grab local copies of all remote branches:
+
+   # Thanks, http://stackoverflow.com/questions/379081/track-all-remote-git-branches-as-local-branches
+   for remote in `git branch -r | grep -v master `; do git checkout --track $remote ; done
+
+1) Do a clone of the 7.x-1.x version into your Drupal 8 site:
+
+   cd ~/Sites/8.x/modules
+   git clone --branch 7.x-1.x webchick@git.drupal.org:project/pants.git
+   cd pants
+
+2) Now, walk through the steps until they don't work. If they don't, you need
+   to rebase. Here's how to do that.
+
+   For example, between DrupalCon Sydney and DrupalCon Portland, we changed
+   the .info file extension to .info.yml. So before we add core = 8.x, we need
+   to add a step that renames the file. This affects all branches.
+
+   # Switch to the 8.x-01-basics branch.
+   git checkout 8.x-01-basics
+
+   # Rename the .info file.
+   git mv pants.info pants.info.yml
+
+   # Commit it.
+   git commit -m "Renaming pants.info to pants.info.yml."
+
+   # Rebase it.
+   git rebase -i 7.x-1.x
+
+   # In rebase, move the commit message to the top of the list from the bottom.
+   "Successfully rebased and updated refs/heads/8.x-01-basics."
+
+   # Delete the old remote branch.
+   git push origin :8.x-01-basics
+
+   # Now, push the new one live.
+   # Yes, the only difference is a ":" ... screw you, Git.
+   git push origin 8.x-01-basics
+
+   # Pull in that same commit on the other branches.
+   git status # Make note of commit hash.
+   git checkout 8.x-02-tests
+   git cherrypick d34db33f
+
