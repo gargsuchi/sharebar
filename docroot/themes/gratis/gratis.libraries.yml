@@ -1,0 +1,10 @@
+gratis-corescripts:
+  version: VERSION
+  js:
+    js/gratis.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal.ajax
+    - core/drupal
+    - core/drupalSettings
+    - core/jquery.once

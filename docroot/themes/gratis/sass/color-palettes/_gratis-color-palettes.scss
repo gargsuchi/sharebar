@@ -1,0 +1,211 @@
+// Palettes defined in colors.
+
+@each $hexvar, $designcolor in $palette {
+  .color-palette-#{$hexvar} {
+
+    blockquote {
+      &:before {
+        color: $designcolor;
+      }
+    }
+
+    .feed-icon {
+      img {
+        background-color: $designcolor;
+        padding: 4px;
+      }
+    }
+
+    .more-link a {
+      background-color: $designcolor;
+      &:hover {
+        background-color: $medium_gray;
+        color: $white;
+      }
+    }
+
+    .item-list-pager {
+      li {
+        a {
+          &:hover {
+            background-color: $designcolor;
+          }
+        }
+        &.pager-current {
+          background-color: $designcolor;
+        }
+      }
+    }
+
+    .vocabulary-links {
+      &:before {
+        color: $designcolor;
+      }
+    }
+
+    .l-off-canvas--left {
+      background-color: $designcolor;
+    }
+    .l-header-wrapper {
+      color: $designcolor;
+    }
+
+    a {
+      color: $designcolor;
+      &:hover {
+        text-decoration: none;
+        color: $medium_gray;
+      }
+    }
+
+    input[type="submit"],
+    input[type="reset"],
+    button,
+    .button a {
+      background-color: $designcolor;
+      color: $white;
+      &:hover {
+        background-color: $medium_gray;
+      }
+    }
+
+    .l-menu-wrapper {
+      background-color: $designcolor;
+    }
+    &.site-name-show h1.site-name a:after {
+      color: $designcolor;
+    }
+    .comment-by-node-author {
+      .comment-arrow {
+        // Get the mixin.
+        @include flex-triangle(20px, 20px, 20px, 0, $designcolor);
+      }
+    }
+  }
+}
+
+// End color palettes loop. ***********
+
+// Dark bg / light headings and text for light color palettes.
+
+body.color-palette-maillot-jaune,
+body.color-palette-caribe,
+body.color-palette-chartreuse {
+  background-color: $black;
+  color: $light_gray2;
+  .l-page-wrapper {
+    background-color: $charcoal_gray;
+  }
+  #{headings()} {
+    color: $light_gray2;
+  }
+  blockquote,
+  code,
+  kbd,
+  pre,
+  samp {
+    background-color: $medium_gray2;
+  }
+  figure figcaption {
+    color: $light_gray;
+  }
+  .main-menu-wrapper {
+    @include breakpoint(0 $menu) {
+      > ul {
+        > li > a {
+          color: $light_gray2;
+        }
+      }
+    }
+    @include breakpoint($menu) {
+      > ul {
+        > li {
+          &.active-trail {
+            > a {
+              color: $light_gray2;
+            }
+          }
+          > a {
+            color: $charcoal_gray;
+            &:hover,
+            &.active {
+              color: $light_gray2;
+            }
+          }
+        }
+        ul a {
+          background-color: $light_gray;
+          color: $charcoal_gray;
+          &:hover {
+            background-color: darken($light_gray, 14%);
+          }
+        }
+      }
+    }
+  }
+  .l-footer-wrapper {
+    background-color: $black;
+  }
+  label,
+  fieldset {
+    color: $light_gray2;
+  }
+  input[type="submit"],
+  input[type="reset"],
+  button,
+  .button a {
+    color: $charcoal_gray;
+    &:hover {
+      background-color: $medium_gray;
+      color: $white;
+    }
+  }
+  a {
+    &:hover {
+      color: $light_gray2;
+    }
+  }
+  table {
+    tr {
+      &.even {
+        background-color: $medium_gray2;
+      }
+      &.odd {
+        background-color: darken($medium_gray2, 8%);
+      }
+    }
+  }
+}
+
+// End dark render.
+
+// color-palette-purple on dark bgs.
+
+.color-palette-purple {
+  &.site-name-show {
+    h1.site-name {
+      a:after {
+        color: $purple_light;
+        &:hover,
+        &:hover:after {
+          color: $light_gray;
+        }
+      }
+    }
+  }
+  .l-header-wrapper,
+  .l-footer-wrapper {
+    a {
+      color: $purple_light;
+      &:hover,
+      &:hover:after {
+        color: $light_gray;
+      }
+    }
+    &:after {
+      color: $purple_light;
+    }
+  }
+}
+
+// end color-palette-purple on dark bgs.

@@ -1,0 +1,154 @@
+<?php
+/**
+ * @file
+ * Functions to support theming in the Business theme.
+ */
+
+
+/**
+ * Override or insert variables into the html template.
+ */
+function business_process_html(&$vars) {
+  // Hook into color.module
+  if (\Drupal::moduleHandler()->moduleExists('color')) {
+    _color_html_alter($vars);
+  }
+}
+
+/**
+ * Override or insert variables into the page template.
+ */
+function business_process_page(&$vars) {
+  // Hook into color.module.
+  if (\Drupal::moduleHandler()->moduleExists('color')) {
+    _color_page_alter($vars);
+  }
+}
+
+/**
+ * Override or insert variables into the breadcrumb template.
+ */
+function business_preprocess_breadcrumb(&$vars) {
+  // @todo: add current page title.
+  // $vars['breadcrumb'][] = '';
+}
+
+
+/**
+ * Override or insert variables into the page template.
+ */
+function business_preprocess_page(&$vars) {
+
+  // Add information about the number of sidebars.
+  $page_object = $vars['page']['#page'];
+  $attributes = $page_object->getBodyAttributes();
+  $classes = $attributes['class'];
+  if (!empty($vars['page']['sidebar_first'])) {
+    $classes[] = 'one-sidebars';
+    $classes[] = 'sidebar-first';
+  }
+  else {
+    $classes[] = 'no-sidebars';
+  }
+  // Store back the classes to the htmlpage object.
+  $attributes['class'] = $classes;
+
+  if (isset($vars['main_menu'])) {
+    $elements = array(
+      '#theme' => 'links__system_main_menu',
+      '#links' => $vars['main_menu']['#links'],
+      '#attributes' => array(
+        'class' => array('main-menu', 'clearfix', 'menu'),
+      ),
+      '#heading' => array(
+        'text' => t('Main menu'),
+        'level' => 'h2',
+        'class' => array('element-invisible'),
+      )
+    );
+    $vars['main_menu'] = drupal_render($elements);
+  }
+  else {
+    $vars['main_menu'] = FALSE;
+  }
+  if (isset($vars['secondary_menu'])) {
+    $vars['secondary_menu'] = array(
+      '#theme' => 'links__system_secondary_menu',
+      '#links' => $vars['secondary_menu']['#links'],
+      'attributes' => array(
+        'class' => array('links', 'secondary-menu', 'clearfix'),
+      ),
+      '#heading' => array(
+        'text' => t('Secondary menu'),
+        'level' => 'h2',
+        'class' => array('element-invisible'),
+      )
+    );
+  }
+  else {
+    $vars['secondary_menu'] = FALSE;
+  }
+
+  // @todo: Provide a slider.
+  if (drupal_is_front_page() && theme_get_setting('slideshow_display','business')) {
+    $vars['slider'] = array();
+    for ($i = 1; $i <= 3; $i++) {
+      $vars['slider'][] = array(
+        //'url' => check_plain(theme_get_setting("slide{$i}_url",'business')),
+        'src' => base_path() . drupal_get_path('theme', 'business') . "/images/slide-image-{$i}.jpg",
+        'desc' => check_markup(theme_get_setting('slide{$i}_desc','business')),
+      );
+    }
+  }
+
+
+  // Copyright.
+  $vars['copyright'] = NULL;
+  if (theme_get_setting('footer_copyright') || theme_get_setting('footer_credits')) {
+    if (theme_get_setting('footer_copyright')) {
+      $footer_copyright = array(
+        '@date' => format_date(REQUEST_TIME, 'custom', 'Y'),
+        '@sitename' => $vars['site_name'],
+      );
+      $vars['copyright']['footer_copyright'] = t("Copyright &copy; @date, @sitename", $footer_copyright);
+    }
+  }
+}
+
+/**
+ * Duplicate of theme_menu_local_tasks() but adds clearfix to tabs.
+ */
+function business_menu_local_tasks(&$variables) {
+  $output = '';
+
+  if (!empty($variables['primary'])) {
+    $variables['primary']['#prefix'] = '<h2 class="element-invisible">' . t('Primary tabs') . '</h2>';
+    $variables['primary']['#prefix'] .= '<ul class="tabs primary clearfix">';
+    $variables['primary']['#suffix'] = '</ul>';
+    $output .= drupal_render($variables['primary']);
+  }
+  if (!empty($variables['secondary'])) {
+    $variables['secondary']['#prefix'] = '<h2 class="element-invisible">' . t('Secondary tabs') . '</h2>';
+    $variables['secondary']['#prefix'] .= '<ul class="tabs secondary clearfix">';
+    $variables['secondary']['#suffix'] = '</ul>';
+    $output .= drupal_render($variables['secondary']);
+  }
+  return $output;
+}
+
+/**
+ * Override or insert variables into the node template.
+ */
+function business_preprocess_node(&$vars) {
+  $node = $vars['node'];
+  if ($vars['view_mode'] == 'full' && node_is_page($vars['node'])) {
+    $vars['classes_array'][] = 'node-full';
+  }
+}
+
+/**
+ * Override or insert variables into the comment template.
+ */
+function business_preprocess_comment(&$vars) {
+  $vars['title_attributes']['class'][] = 'comment-title';
+}

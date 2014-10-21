@@ -1,0 +1,47 @@
+name: Gratis
+description: Drupal 8.x-2.x version of the Gratis Theme by <a href="http://highrockmedia.com">Danny Englander</a>
+# core: 8.x
+engine: twig
+# version: VERSION
+type: theme
+screenshot: screenshot.png
+stylesheets:
+  all:
+   - css/gratis.normalize.css
+   - css/gratis.hacks.css
+   - css/gratis.color-palettes.css
+   - css/gratis.core.css
+   - css/gratis.styles.css
+# Override a CSS file:
+stylesheets-remove:
+  - system.theme.css
+regions:
+   footer_first: 'Footer first'
+   footer_second: 'Footer Second'
+   footer_third: 'Footer Third'
+   top_links: 'Top Links'
+   primary_menu: 'Primary menu'
+   thirdparty_menu: 'Third party menu'
+   preface_first: 'Preface first'
+   preface_second: 'Preface second'
+   preface_third: 'Preface third'
+   help: 'Help'
+   content_top: 'Content top'
+   sidebar_first: 'Sidebar First'
+   sidebar_second: 'Sidebar Second'
+   content: 'Content'
+   postscript_first: 'Postscript first'
+   postscript_second: 'Postscript second'
+   postscript_third: 'Postscript third'
+settings:
+   gratis_viewport: '0'
+   theme_color_palette: 'orange'
+   gratis_localcss: '0'
+   gratis_custom_css_location: '0'
+   breadcrumbs: '0'
+
+# Information added by Drupal.org packaging script on 2014-10-19
+version: '8.x-2.0-beta1+6-dev'
+core: '8.x'
+project: 'gratis'
+datestamp: 1413729540

@@ -1,0 +1,54 @@
+name: 'Business'
+type: theme
+description: 'Business is a premium Drupal 8 theme. Developed by <a href="http://www.devsaran.com">Devsaran.com</a>.'
+core: 8.x
+# Stylesheets
+stylesheets:
+  all:
+    - 'css/style.css'
+    - 'color/colors.css'
+# Scripts
+# scripts:
+  # - 'js/superfish.js'
+  # - 'js/supersubs.js'
+  # - 'js/sfmenu.js'
+# Regions
+regions:
+  header: Header
+  homequotes: Home Quotes
+  home_high1: Home Highlight 1
+  home_high2: Home Highlight 2
+  home_high3: Home Highlight 3
+  content_top: Content Top
+  help: Help
+  content: Content
+  sidebar_first: First Sidebar
+  footer_first: First Bottom
+  footer_second: Second Bottom
+  footer_third: Third Bottom
+  footer_fourth: Fourth Bottom
+  footer: Footer
+# Features
+features:
+  - 'logo'
+  - 'name'
+  - 'slogan'
+  - 'node_user_picture'
+  - 'comment_user_picture'
+  - 'comment_user_verification'
+  - 'favicon'
+  - 'main_menu'
+  - 'secondary_menu'
+# Settings
+settings:
+  footer_copyright: '1'
+  footer_credits: '1'
+  slideshow_display: '1'
+  show_front_content: '1'
+  breadcrumbs: '1'
+  slide1_desc: 'What We Do'
+  slide2_desc: 'Who We Are'
+  slide3_desc: 'Our Service'
+  slide1_url: 'node/1'
+  slide2_url: 'node/2'
+  slide3_url: 'node/3'

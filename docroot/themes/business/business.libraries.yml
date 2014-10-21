@@ -1,0 +1,28 @@
+drupal.superfish:
+  version: VERSION
+  js:
+    js/superfish.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+drupal.supersubs:
+  version: VERSION
+  js:
+    js/supersubs.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+drupal.sfmenu:
+  version: VERSION
+  js:
+    js/sfmenu.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+drupal.sliding_effect:
+  version: VERSION
+  js:
+    js/sliding_effect.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal

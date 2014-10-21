@@ -1,0 +1,161 @@
+// Import variables.
+@import "../variables/vars";
+
+// Core imports.
+@import "compass";
+@import "breakpoint";
+
+// Vertical rhythm.
+@include establish-baseline;
+
+// Google font import.
+@import url(//fonts.googleapis.com/css?family=EB+Garamond|IM+Fell+Double+Pica|Open+Sans|Montserrat);
+
+body {
+  color: $medium_gray2;
+}
+
+// Compass mixin all headers
+#{headings()} {
+  color: $medium_gray2;
+  font-weight: normal;
+}
+
+h1 {
+  @include adjust-font-size-to($h1);
+  margin: 0 auto rhythm(.5) auto;
+  @include breakpoint(0 $tab) {
+    @include adjust-font-size-to($h1-tab);
+    margin: 0 auto rhythm(.4) auto;
+  }
+}
+
+h2 {
+  @include adjust-font-size-to($h2);
+  margin: 0 auto rhythm(.5) auto;
+}
+
+h3 {
+  @include adjust-font-size-to($h3);
+  margin: 0 auto rhythm(.5) auto;
+}
+
+h4 {
+  @include adjust-font-size-to($h4);
+  margin: 0 auto rhythm(.4) auto;
+}
+
+h5 {
+  @include adjust-font-size-to($h5);
+  margin: 0 auto rhythm(.3) auto;
+}
+
+h6 {
+  @include adjust-font-size-to($h6);
+  margin: 0 auto rhythm(.2) auto;
+}
+
+.heading-typeface-garamond {
+  h2 {
+    @include adjust-font-size-to($h2 + 6);
+    margin: 0 auto rhythm(.6) auto;
+  }
+}
+
+h1.site-name {
+  @include adjust-font-size-to($h3);
+  margin: 0 auto rhythm(.4) auto;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  display: inline-block;
+}
+
+h3.site-slogan {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  display: inline-block;
+  color: darken($light_gray2, 10%);
+}
+
+.footer h2 {
+  color: $light_gray2;
+}
+
+p {
+  margin: 0 auto rhythm(.85) auto;
+}
+
+blockquote {
+  display: block;
+  background: $white;
+  padding: 15px 20px 15px 170px;
+  margin: 0 0 20px;
+  position: relative;
+  border: 1px dotted $medium_gray;
+  min-height: 120px;
+  &:before {
+    content: "\201C";
+    font-family: Georgia, serif;
+    font-size: 14em;
+    font-weight: bold;
+    color: $medium_gray;
+    position: absolute;
+    left: 10px;
+    line-height: 0.9;
+    @include breakpoint(0 $tab) {
+      opacity: .6;
+    }
+  }
+  &:after {
+    content: "";
+  }
+  @include breakpoint(0 $tab) {
+    padding: 14px;
+  }
+}
+
+// Code.
+code,
+kbd,
+pre,
+samp {
+  background-color: lighten($light_gray, 12%);
+  display: block;
+  font-family: $font-mono;
+  font-size: 1rem;
+  overflow: auto;
+  padding: 20px;
+  white-space: pre-wrap;
+  br {
+    display: none;
+  }
+}
+
+// Typography loops.
+
+@each $typevar, $designtype in $typeface {
+  .heading-typeface-#{$typevar} {
+    #{headings()} {
+      font-family: $designtype;
+    }
+  }
+}
+
+@each $typevar, $designtype in $typeface {
+  body {
+    &.body-typeface-#{$typevar} {
+      font-family: $designtype;
+    }
+  }
+}
+
+.body-typeface-garamond .l-page-wrapper .l-main {
+  p,
+  span {
+    @include adjust-font-size-to(19px);
+  }
+  li {
+    @include adjust-font-size-to(19px);
+  }
+}
+
