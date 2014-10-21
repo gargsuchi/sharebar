@@ -8,7 +8,8 @@
   },
   "require": {
     "grom358/pharborist": "dev-master",
-    "symfony/finder": "2.6.*@dev"
+    "symfony/finder": "2.6.*@dev",
+    "symfony/filesystem": "2.6.*@dev"
   },
   "keywords": [
     "Drupal",
